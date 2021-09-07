@@ -1,8 +1,11 @@
+import time
+
 import openpyxl
 from docx import Document
 import os
 import shutil
 from icecream import ic
+import zipfile
 
 
 def SignUpDocx(TITLE, i, path, primer_PATH):  # 文件生成
@@ -57,12 +60,45 @@ def load_excel(excel_file):
         if count == 0:
             # ic(row)
             row = [i.split("_")[1] for i in row]
-            ic(row)
+            # ic(row)
             count += 1
         rows_list.append(row)
     os.remove(excel_file)
+    for i in os.listdir("."):
+        if ".xlsx" in i:
+            os.remove(i)
     return rows_list
 
+
+def get_all_file_paths(directory):
+    # 初始化文件路径列表
+    file_paths = []
+    for root, directories, files in os.walk(directory):
+        for filename in files:
+            # 连接字符串形成完整的路径
+            filepath = os.path.join(root, filename)
+            file_paths.append(filepath)
+
+    # 返回所有文件路径
+    return file_paths
+
+
+def file2zip(name):
+    for i in os.listdir("."):
+        if ".zip" in i:
+            os.remove(i)
+    now_time = time.strftime(" %m-%d(%H：%M)", time.localtime())
+    # zip_file = zipfile.ZipFile(name + now_time + '.zip', 'w')
+    # # 把zfile整个目录下所有内容，压缩为new.zip文件
+    # zip_file.write('zfile', compress_type=zipfile.ZIP_DEFLATED)
+    # # 把c.txt文件压缩成一个压缩文件
+    # # zip_file.write('c.txt',compress_type=zipfile.ZIP_DEFLATED)
+    # zip_file.close()
+    with zipfile.ZipFile(name + now_time + '.zip', 'w') as my_zip:
+        # my_zip.write('./报名表/2021年学生社团联合会志愿者电子报名表.xlsx')
+        # my_zip.write("./报名表")
+        for file in get_all_file_paths("./报名表"):
+            my_zip.write(file)
 
 def write_excel(signUp_list, excel_name):
     bk1 = openpyxl.Workbook()
@@ -75,15 +111,19 @@ def write_excel(signUp_list, excel_name):
 if __name__ == "__main__":
     PATH = "./报名表/"
     # f = open(PATH + "2021年学生社团联合会志愿者电子报名表.csv", "r", encoding="UTF-8")
-    excel_reader = load_excel("./2021年学生社团联合会志愿者电子报名表_数据详情表_原始数据_202109071913.xlsx")
-    sign_up_list = tuple(DuplicateRemoval(list(excel_reader)))  # 去重
-    write_excel(sign_up_list, "2021年学生社团联合会志愿者电子报名表.xlsx")
-    TITLE = tuple(sign_up_list[0])
+    for i in os.listdir("."):
+        if ".xlsx" in i:
+            excel_reader = load_excel(i)
+            sign_up_list = tuple(DuplicateRemoval(list(excel_reader)))  # 去重
+            write_excel(sign_up_list, "./报名表/2021年学生社团联合会志愿者电子报名表.xlsx")
+            TITLE = tuple(sign_up_list[0])
 
-    RemoveFolder(PATH, '第一志愿/')
-    RemoveFolder(PATH, '第二志愿/')  # 删除非空文件夹，上同
-    CreateFolder(PATH, ['第一志愿/', '第二志愿/'])  # 删除之前的数据，已去掉重复填报者
+            RemoveFolder(PATH, '第一志愿/')
+            RemoveFolder(PATH, '第二志愿/')  # 删除非空文件夹，上同
+            CreateFolder(PATH, ['第一志愿/', '第二志愿/'])  # 删除之前的数据，已去掉重复填报者
 
-    for wish in ['第一志愿/', '第二志愿/']:
-        CreateFolder(PATH + wish, ["宣传媒体中心", "办公室", "社团活动管理部", "就业部", "财务与监察部", "社团事务部", "阳光服务部", "自律会"])
-        Shunt(wish, TITLE, sign_up_list, PATH)
+            for wish in ['第一志愿/', '第二志愿/']:
+                CreateFolder(PATH + wish, ["宣传媒体中心", "办公室", "社团活动管理部", "就业部", "财务与监察部", "社团事务部", "阳光服务部", "自律会"])
+                Shunt(wish, TITLE, sign_up_list, PATH)
+            file2zip("报名表")
+            break
