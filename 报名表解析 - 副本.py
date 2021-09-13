@@ -10,7 +10,7 @@ def SignUpDocx(TITLE, i, path):  # 文件生成
     for count in range(1, 12):
         document.add_heading(TITLE[count], level=1, )
         document.add_paragraph(i[count], style="Intense Quote")
-    document.save(PATH + path + i[1] + ".docx")  # 可以覆盖保存，PATH是根目录
+    document.save(PATH + path + i[0] + ".docx")  # 可以覆盖保存，PATH是根目录
 
 
 def CreateFolder(path, name_list):  # 文件夹生成

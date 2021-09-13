@@ -1,5 +1,6 @@
-import time
+#! /usr/bin/env python3
 
+import time
 import openpyxl
 from docx import Document
 import os
@@ -22,7 +23,7 @@ def CreateFolder(path, name_list):  # 文件夹生成
         isExists = os.path.exists(path + str(i))
         if not isExists:
             os.makedirs(path + str(i))
-            print("{} 目录创建成功".format(i))
+            # print("{} 目录创建成功".format(i))
         else:
             print("{} 目录已经存在，文件删除出错，请检查".format(i))
             break
@@ -37,7 +38,7 @@ def DuplicateRemoval(prime_list):  # 根据学号和手机去重
     for i in prime_list:
         for j in prime_list[:prime_list.index(i)]:
             if j[2] == i[2] or j[3] == i[3] or j[4] == i[4]:
-                print("+{:6}已被去重".format(i[1]))
+                print("+{:6}已被去重".format(i[0]))
                 prime_list.remove(j)
     return prime_list
 
